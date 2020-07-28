@@ -131,15 +131,15 @@ items.post('/upload-image/:itemId', mdUploadImage, (req, res) => {
     console.dir(req.files)
     const { itemId } = req.params
     const { path: image } = req.files.image
-    Item.findById(userId)
+    Item.findById(itemId)
         .then(async (itemFound) => {
             try {
-                await itemFound.update({ image })
+                await itemFound.update({ images: [image] })
             } catch (error) {
                 fs.unlinkSync(image)
                 res.status(501).json({ msg: 'Image not uploaded and not saved' })
             }
-            res.status(201).json({ msg: 'Image uploaded', student: studentFound })
+            res.status(201).json({ msg: 'Image uploaded', item: itemFound })
         })
         .catch((err) => {
             console.warn(err)
