@@ -1,0 +1,589 @@
+swagger: "2.0"
+info:
+  description: "This is a sample of a backend project"
+  version: "1.0.0"
+  title: "SCESI DELIVERY"
+host: "localhost:9090"
+basePath: "/"
+tags:
+- name: "items"
+- name: "stores"
+- name: "clients"
+- name: "dealers"
+- name: "categories"
+schemes:
+  - "http"
+paths:
+  /items:
+    post:
+      tags:
+      - "items"
+      summary: "Add a new item"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in : "body"
+        name: "body" 
+        required: true
+        schema:
+          $ref: '#/definitions/Item'
+      responses:
+        "405":
+          description: "Invalid input"
+        "201":
+          description: "Item created"
+    get:
+        tags:
+        - "items"
+        summary: "Get all items"
+        description: ""
+        operationId: ""
+        parameters:
+        - in: query
+          name: itemName
+          type: string
+        consumes:
+        - "application/json"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Its ok"   
+  /items/{itemID}:
+    put:
+      tags:
+      - "items"
+      summary: "Delete item"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in : path
+        name: itemID 
+        type: integer
+        required: true
+      responses:
+        "405":
+          description: "Invalid input"
+        "201":
+          description: "Item deleted"
+    patch:
+      tags:
+      - "items"
+      summary: "Update item"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in : path
+        name: itemID
+        required: true
+        type: integer
+      - in : "body"
+        name: "body" 
+        required: true
+        schema:
+          $ref: '#/definitions/Item'
+      responses:
+        "405":
+          description: "Invalid input"
+        "201":
+          description: "Information's item updated"  
+    get:
+      tags:
+      - "items"
+      summary: "Get info of a item"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: path
+          name: itemID
+          type: integer
+          required: true
+        - in: query
+          name: itemName
+          type: string
+      responses:
+        200:
+          description: "Its ok"
+          
+  /stores:
+    post:
+      tags:
+      - "stores"
+      summary: "Add a new store"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in : "body"
+        name: "body" 
+        required: true
+        schema:
+          $ref: '#/definitions/Store'
+      responses:
+        "405":
+          description: "Invalid input"
+        "201":
+          description: "Store created"
+    get:
+      tags:
+      - "stores"
+      summary: "Get all stores"
+      description: ""
+      operationId: ""
+      parameters:
+        - in: query
+          name: storeName
+          type: string
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Its ok"
+  /stores/{storeID}:
+    put:
+      tags:
+      - "stores"
+      summary: "Delete store"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in : path 
+        name: storeID
+        type: integer
+        required: true
+      responses:
+        "405":
+          description: "Invalid input"
+        "201":
+          description: "Store deleted"
+    patch:
+      tags:
+      - "stores"
+      summary: "Update info store"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in : path 
+        name: storeID
+        type: integer
+        required: true
+      - in : "body"
+        name: "body" 
+        required: true
+        schema:
+          $ref: '#/definitions/Store'
+      responses:
+        "405":
+          description: "Invalid input"
+        "201":
+          description: "Information's store updated"  
+    get:
+      tags:
+      - "stores"
+      summary: "Get info of a store"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: path
+          name: storeID
+          type: integer
+          required: true
+      responses:
+        200:
+          description: "Its ok"
+  
+  /clients:
+    post:
+      tags:
+      - "clients"
+      summary: "Add a new client"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in : "body"
+        name: "body" 
+        required: true
+        schema:
+          $ref: '#/definitions/Client'
+      responses:
+        "405":
+          description: "Invalid input"
+        "201":
+          description: "Client created"
+    get:
+      tags:
+      - "clients"
+      summary: "Get all clients"
+      description: ""
+      operationId: ""
+      parameters:
+        - in: query
+          name: clientName
+          type: string  
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Its ok"
+  /clients/{clientID}:
+    put:
+      tags:
+      - "clients"
+      summary: "Delete client"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in : path
+        name: clientID
+        type: string
+        required: true
+      responses:
+        "405":
+          description: "Invalid input"
+        "201":
+          description: "Client deleted"
+    patch:
+      tags:
+      - "clients"
+      summary: "Update info client"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in : path
+        name: clientID
+        type: integer
+        required: true
+      - in : "body"
+        name: "body" 
+        required: true
+        schema:
+          $ref: '#/definitions/Client'  
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "Information's client updated"  
+    get:
+      tags:
+      - "clients"
+      summary: "Get info of a client"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: path
+          name: clientID
+          type: integer
+          required: true
+        - in: query
+          name: clientName
+          type: string
+      responses:
+        200:
+          description: "Its ok"
+  
+  /categories:
+    post:
+      tags:
+      - "categories"
+      summary: "Add a new category"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in : "body"
+        name: "body" 
+        required: true
+        schema:
+          $ref: '#/definitions/Category'
+      responses:
+        "405":
+          description: "Invalid input"
+        "201":
+          description: "Category created"
+    get:
+      tags:
+      - "categories"
+      summary: "Get info of a store"
+      description: ""
+      operationId: ""
+      parameters:
+        - in: query
+          name: categoryName
+          type: string
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Its ok"
+  /categories/{categoryID}:
+    put:
+      tags:
+      - "categories"
+      summary: "Delete category"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in : path
+        name: categoryID
+        type: integer
+        required: true
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "Category deleted"
+    patch:
+      tags:
+      - "categories"
+      summary: "Update info category"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: categoryID
+        type: integer
+        required: true
+      - in : body 
+        name: newName
+        required: true
+        schema:
+          $ref: "#/definitions/Category"
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "Information's category updated"  
+    get:
+      tags:
+      - "categories"
+      summary: "Get info of a store"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: path
+          name: categoryID
+          type: integer
+          required: true
+        - in: query
+          name: categoryName
+          type: string
+      responses:
+        200:
+          description: "Its ok"
+  
+  /dealers:
+    post:
+      tags:
+      - "dealers"
+      summary: "Add a new dealer"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in : "body"
+        name: "body" 
+        required: true
+        schema:
+          $ref: '#/definitions/Dealer'
+      responses:
+        "405":
+          description: "Invalid input"
+        "201":
+          description: "Dealer created"
+    get:
+      tags:
+      - "dealers"
+      summary: "Get info of a dealer"
+      description: ""
+      operationId: ""
+      parameters:
+        - in: query
+          name: dealerName
+          type: string
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Its ok"
+  /dealers/{dealerID}:
+    put:
+      tags:
+      - "dealers"
+      summary: "Delete category"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in : path
+        name: dealerID
+        type: integer
+        required: true
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "Dealer deleted"
+    patch:
+      tags:
+      - "dealers"
+      summary: "Update info category"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: dealerID
+        type: integer
+        required: true
+      - in : "body"
+        name: "body" 
+        required: true
+        schema:
+          $ref: "#/definitions/Dealer"
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "Information's dealer updated"  
+    get:
+      tags:
+      - "dealers"
+      summary: "Get info of a dealer"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: path
+          name: dealerID
+          type: integer
+          required: true
+        - in: query
+          name: dealerName
+          type: string
+      responses:
+        200:
+          description: "Its ok"
+definitions:
+  Item:
+    type: "object"
+    properties:
+      images: 
+        type: array
+        items:
+          type: object
+      category:
+        type: object
+      store:
+        type: object
+      name:
+        type: "string"
+      cost:
+        type: number ##float
+      price:
+        type: number
+  Store:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+  Client:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      email:
+        type: "string"
+  Category:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+  Dealer:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      email:
+        type: "string"

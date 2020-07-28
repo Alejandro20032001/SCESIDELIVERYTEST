@@ -1,4 +1,6 @@
 import express from 'express'
+import swaggerUi from 'swagger-ui-express'
+import YAML from 'yamljs'
 
 import categories from './routes/categories'
 import clients from './routes/clients'
@@ -8,6 +10,8 @@ import items from './routes/items'
 
 import cors from 'cors'
 import bluebird from "bluebird";
+const swaggerDocument = YAML.load('./docs/swagger.yaml');
+
 // getting-started.js MongoDb
 import mongoose from 'mongoose'
 import { Items } from './models';
@@ -31,7 +35,12 @@ const handler = () => {
 }
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
-
+//docs
+app.use('/api-docs', function(req, res, next){
+    swaggerDocument.host = req.get('host');
+    req.swaggerDoc = swaggerDocument;
+    next();
+}, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // routes
 app.use('/categories', categories);
 app.use('/clients', clients);
