@@ -1,0 +1,47 @@
+import express from 'express'
+
+import categories from './routes/categories'
+import clients from './routes/clients'
+import dealers from './routes/dealers'
+import stores from './routes/stores'
+import items from './routes/items'
+
+import cors from 'cors'
+import bluebird from "bluebird";
+// getting-started.js MongoDb
+import mongoose from 'mongoose'
+import { Items } from './models';
+mongoose.Promise = bluebird
+const schema = 'delivery'
+const urlDb = `mongodb://localhost/${schema}`;
+mongoose.connect(urlDb, { useNewUrlParser: true });
+
+
+const app = express()
+app.use(cors({
+    origin:['http://localhost:9090',
+            'https://editor.swagger.io',
+            'http://app.swaggerhub.com'
+    ],
+    methods: ['GET', 'POST','PATCH','PUT']
+
+}))
+const handler = () => {
+    console.log('http://localhost:9090')
+}
+app.use(express.json()) // for parsing application/json
+app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+
+// routes
+app.use('/categories', categories);
+app.use('/clients', clients);
+app.use('/dealers', dealers);
+app.use('/stores', stores);
+app.use('/items', items);
+// app.use(function (req, res, next) {
+//     res.status(404).send('Sorry cant find that!');
+// });
+
+//app.use(exampleRoute)
+
+app.listen(9090, handler)
