@@ -67,7 +67,7 @@ paths:
       parameters:
       - in : path
         name: itemID 
-        type: integer
+        type: string
         required: true
       responses:
         "405":
@@ -88,7 +88,7 @@ paths:
       - in : path
         name: itemID
         required: true
-        type: integer
+        type: string
       - in : "body"
         name: "body" 
         required: true
@@ -112,7 +112,7 @@ paths:
       parameters:
         - in: path
           name: itemID
-          type: integer
+          type: string
           required: true
         - in: query
           name: itemName
@@ -120,7 +120,29 @@ paths:
       responses:
         200:
           description: "Its ok"
-          
+  /items/upload-image/{itemID}:
+    post: 
+      tags:
+      - "items"
+      summary: "Add a image"
+      description: ""
+      operationId: ""
+      consumes:
+      - "multipart/form-data"      
+      parameters:
+      - in: formData
+        name: image
+        type: file
+        description: The file to upload.
+      - in : path
+        name: itemID
+        type: string
+        required: true
+      responses:
+        "405": 
+          description: "Invalid input"
+        "201":
+          description: "Image uploaded"
   /stores:
     post:
       tags:
@@ -174,7 +196,7 @@ paths:
       parameters:
       - in : path 
         name: storeID
-        type: integer
+        type: string
         required: true
       responses:
         "405":
@@ -194,7 +216,7 @@ paths:
       parameters:
       - in : path 
         name: storeID
-        type: integer
+        type: string
         required: true
       - in : "body"
         name: "body" 
@@ -219,7 +241,7 @@ paths:
       parameters:
         - in: path
           name: storeID
-          type: integer
+          type: string
           required: true
       responses:
         200:
@@ -298,7 +320,7 @@ paths:
       parameters:
       - in : path
         name: clientID
-        type: integer
+        type: string
         required: true
       - in : "body"
         name: "body" 
@@ -323,7 +345,7 @@ paths:
       parameters:
         - in: path
           name: clientID
-          type: integer
+          type: string
           required: true
         - in: query
           name: clientName
@@ -385,7 +407,7 @@ paths:
       parameters:
       - in : path
         name: categoryID
-        type: integer
+        type: string
         required: true
       responses:
         "405":
@@ -405,7 +427,7 @@ paths:
       parameters:
       - in: path
         name: categoryID
-        type: integer
+        type: string
         required: true
       - in : body 
         name: newName
@@ -430,7 +452,7 @@ paths:
       parameters:
         - in: path
           name: categoryID
-          type: integer
+          type: string
           required: true
         - in: query
           name: categoryName
@@ -492,7 +514,7 @@ paths:
       parameters:
       - in : path
         name: dealerID
-        type: integer
+        type: string
         required: true
       responses:
         "405":
@@ -512,7 +534,7 @@ paths:
       parameters:
       - in: path
         name: dealerID
-        type: integer
+        type: string
         required: true
       - in : "body"
         name: "body" 
@@ -537,7 +559,7 @@ paths:
       parameters:
         - in: path
           name: dealerID
-          type: integer
+          type: string
           required: true
         - in: query
           name: dealerName
@@ -554,9 +576,9 @@ definitions:
         items:
           type: object
       category:
-        type: object
+        type: objectId
       store:
-        type: object
+        type: objectId
       name:
         type: "string"
       cost:

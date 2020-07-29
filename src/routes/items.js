@@ -127,11 +127,11 @@ items.patch("/:itemID",(req,res,next)=>{
     }
 })
 
-items.post('/upload-image/:itemId', mdUploadImage, (req, res) => {
+items.post('/upload-image/:itemID', mdUploadImage, (req, res) => {
     console.dir(req.files)
-    const { itemId } = req.params
+    const { itemID } = req.params
     const { path: image } = req.files.image
-    Item.findById(itemId)
+    Item.findById(itemID)
         .then(async (itemFound) => {
             try {
                 await itemFound.update({ images: [image] })
