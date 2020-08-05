@@ -90,7 +90,14 @@ items.get('/:itemID', (req, res, next) => {
     const { itemID: id } = req.params
     Item.findOne({
         _id: id
-    })
+    }).populate([{
+        path: 'store',
+        populate: { path: 'item' }
+      },
+      {
+        path: 'category',
+        populate: { path: 'item' }
+      }])
     .then(itemFound => {
         if (itemFound){
             res.status(200).json(itemFound)
