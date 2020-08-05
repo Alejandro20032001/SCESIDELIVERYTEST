@@ -4,33 +4,28 @@ const ItemSchema = new Schema({
     name: {
         type: String,
         index: true,
-        unique: true,
         required: true
     },
     category: { 
-        type: Schema.Types.ObjectId, ref: 'categories',
+        type: Schema.Types.ObjectId, ref: 'Category',
         index: true,
-        unique: true,
         required: true
     },
     store: { 
-        type: Schema.Types.ObjectId, ref: 'stores',
+        type: Schema.Types.ObjectId, ref: 'Store',
         index: true,
-        unique: true,
         required: true
     },
     ////float?
     cost: {
         type: Number,
         index: true,
-        unique: true,
         required: true
     },
     //float?
     price: {
         type: Number,
         index: true,
-        unique: true,
         required: true
     },
     images: [String]

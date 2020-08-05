@@ -1,5 +1,5 @@
 import express from "express";
-import {Item} from "../models";
+import {Item, Store, Category} from "../models";
 import { mdUploadImage } from "../services/uploadFiles";
 import fs from 'fs'
 import store from "../models/store";
@@ -9,24 +9,44 @@ const items = express.Router()
 
 items.post("", (req, res, next) => {
     const { body } = req
+    const categoryId = req.body.category
+    const storeId = req.body.store
     console.log(body);
-    Item.create({
-        name: req.body.name,
-        category:
-                mongoose.Types.ObjectId(req.body.category),
-        store:
-                mongoose.Types.ObjectId(req.body.store),
-        cost: req.body.cost,        
-        price: req.body.price
-    })
-        .then(itemCreated => {
+    Promise.all([
+        Item.create({
+            name: req.body.name,
+            category:
+                    mongoose.Types.ObjectId(categoryId),
+            store:
+                    mongoose.Types.ObjectId(storeId),
+            cost: req.body.cost,            
+            price: req.body.price
+        }),
+        Store.updateOne({_id:storeId},
+        {
+            $addToSet: {
+                items:
+                    mongoose.Types.ObjectId(req.body.store)
+            }
+        }),
+        Category.updateOne({_id:categoryId},
+        {
+            $addToSet: {
+                items:
+                    mongoose.Types.ObjectId(req.body.category)
+            }
+        })
+
+    ])
+    .then(itemCreated => {
             res.nosql = itemCreated
             res.msg = 'item created'
             res.status(201).json(itemCreated)
-        })
+    })
     .catch(err => {
         res.status(500).json(err)
     })
+    
 });
 // all 
 items.get('', (req, res, next) => {
@@ -49,7 +69,14 @@ items.get('', (req, res, next) => {
         })
     }
     else{
-        Item.find({}).then(itemsFound => {
+        Item.find({}).populate([{
+                path: 'store',
+                populate: { path: 'item' }
+              },
+              {
+                path: 'category',
+                populate: { path: 'item' }
+              }]).then(itemsFound => {
             res.status(200).json(itemsFound)
         })
         .catch(err => {
@@ -111,7 +138,8 @@ items.patch("/:itemID",(req,res,next)=>{
             {_id:id},
             {
                 name: req.body.name,
-                email: req.body.email    
+                cost: req.body.cost,
+                price: req.body.price
             }
         ).then(itemUpdated=> {
             response.nosql = itemUpdated

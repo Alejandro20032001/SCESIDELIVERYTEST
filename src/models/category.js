@@ -7,7 +7,7 @@ const categoriesSchema = new Schema({
         unique: true,
         required: true
     },
-    items : [{ type: Schema.Types.ObjectId, ref: 'Items' }]
+    items : [{ type: Schema.Types.ObjectId, ref: 'Item' }]
 })
 
 export default model('Category', categoriesSchema)
