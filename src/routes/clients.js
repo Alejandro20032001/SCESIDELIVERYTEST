@@ -17,7 +17,7 @@ clients.post("", (req, res, next) => {
         res.status(500).json(err)
     })
 });
-// all 
+// all // token
 clients.get('', (req, res, next) => {
     const {body} = req.query
     console.log({body})

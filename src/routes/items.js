@@ -2,8 +2,10 @@ import express from "express";
 import {Item, Store, Category} from "../models";
 import { mdUploadImage } from "../services/uploadFiles";
 import fs from 'fs'
-import store from "../models/store";
+import path from 'path'
 import mongoose from 'mongoose'
+import { sign } from "../services/jwtService";
+import { mdJWT } from "../middleware/verifyToken.js";
 
 const items = express.Router()
 
@@ -180,5 +182,15 @@ items.post('/upload-image/:itemID', mdUploadImage, (req, res) => {
             console.warn(err)
             res.status(500).json({ msg: 'Image not uploaded' })
         })
+})
+
+items.get('/get-image/:image', (req, res) => {
+    console.dir(req.files)
+    const { image } = req.params
+    const pathFile = `uploads/items/${image}`;
+    if(fs.existsSync(pathFile))
+        res.sendFile(path.resolve(`uploads/items/${image}`))
+    else
+        res.status(404).json({ msg: 'Image not found' })
 })
 export default items

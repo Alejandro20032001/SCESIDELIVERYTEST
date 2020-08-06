@@ -25,7 +25,6 @@ const app = express()
 app.use(cors({
     origin:['http://localhost:9090',
             'https://editor.swagger.io',
-            'http://app.swaggerhub.com'
     ],
     methods: ['GET', 'POST','PATCH','PUT']
 
