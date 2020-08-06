@@ -1,6 +1,6 @@
 import express from "express";
 import {Category} from "../models";
-
+import { sign } from '../services/jwtService'
 const categories = express.Router()
 
 categories.post("", (req, res, next) => {

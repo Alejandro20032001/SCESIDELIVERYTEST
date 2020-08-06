@@ -1,6 +1,6 @@
 import express from "express";
 import {Client} from "../models";
-
+import { sign } from '../services/jwtService'
 
 const clients = express.Router()
 

@@ -1,6 +1,6 @@
 import express from "express";
 import {Dealer} from "../models";
-
+import { sign } from '../services/jwtService'
 
 const dealers = express.Router()
 

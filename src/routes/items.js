@@ -118,17 +118,20 @@ items.put("/:itemID", (req, res, next) => {
     const { itemID: id } = req.params
     if (id) {
         let response = {}
-        Item.findOneAndDelete({_id:id}, function(err, docs) {
-            if(!err){
-                response.nosql = docs    
-                sign({docs})
-                    .then(token => {
-                        response.token = token
-                })   
-                console.log(response)
-                return docs
-            }
-        }).then(() => {
+        Promise.all([
+            Item.findOneAndDelete({_id:id}, function(err, docs) {
+                if(!err){
+                    response.nosql = docs    
+                    sign({docs})
+                        .then(token => {
+                            response.token = token
+                    })   
+                    console.log(response)
+                    return docs
+                }
+            })
+        ])
+        .then(() => {
             response.msg = 'item delete'
             res.status(200).send(response)
         })
