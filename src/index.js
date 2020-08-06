@@ -1,6 +1,8 @@
 import express from 'express'
 import swaggerUi from 'swagger-ui-express'
 import YAML from 'yamljs'
+import {PORT,URLDB} from './env'
+
 
 import categories from './routes/categories'
 import clients from './routes/clients'
@@ -14,11 +16,9 @@ const swaggerDocument = YAML.load('./docs/swagger.yaml');
 
 // getting-started.js MongoDb
 import mongoose from 'mongoose'
-import { Items } from './models';
 mongoose.Promise = bluebird
-const schema = 'delivery'
-const urlDb = `mongodb://localhost/${schema}`;
-mongoose.connect(urlDb, { useNewUrlParser: true });
+
+mongoose.connect(URLDB, { useNewUrlParser: true });
 
 
 const app = express()
@@ -52,4 +52,4 @@ app.use('/items', items);
 
 //app.use(exampleRoute)
 
-app.listen(9090, handler)
+app.listen(PORT, handler)

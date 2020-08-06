@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-const  secret  = "my secretjwt"
+import { SECRET as secret } from '../env'
 
 const minutes = 180;
 

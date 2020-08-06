@@ -73,7 +73,11 @@ stores.put("/:storeID", (req, res, next) => {
         let response = {}
         Store.findOneAndDelete({_id:id}, function(err, docs) {
             if(!err){
-                response.nosql = docs           
+                response.nosql = docs   
+                sign({docs})
+                        .then(token => {
+                        response.token = token
+                    })          
                 console.log(response)
                 return docs
             }
@@ -100,7 +104,16 @@ stores.patch("/:storeID",(req,res,next)=>{
             {_id:id},
             {
                 name: req.body.name,   
-            }
+            },
+            function(err, result) {
+                if (!err) {
+                    sign({result})
+                        .then(token => {
+                        response.token = token
+                    })  
+                    response.nosql = result
+                }
+              }
         ).then(storeUpdated=> {
             response.nosql = storeUpdated
             response.msg = 'store updated'
