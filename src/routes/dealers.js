@@ -71,9 +71,13 @@ dealers.put("/:dealerID", (req, res, next) => {
     const { dealerID: id } = req.params
     if (id) {
         let response = {}
-        Dealer.findOneAndDelete({_id:id}, function(err, docs) {
+        Dealer.findByIdAndDelete({_id:id}, function(err, docs) {
             if(!err){
-                response.nosql = docs           
+                response.nosql = docs  
+                sign({result})
+                        .then(token => {
+                        response.token = token
+                    })          
                 console.log(response)
                 return docs
             }
@@ -96,11 +100,20 @@ dealers.patch("/:dealerID",(req,res,next)=>{
     console.log(body)
     if(req.body){
         let response = {}
-        Dealer.updateOne(
+        Dealer.findByIdAndUpdate(
             {_id:id},
             {
                 name: req.body.name,
                 email: req.body.email    
+            },
+            function(err, result) {
+                if (!err) {
+                    sign({result})
+                        .then(token => {
+                        response.token = token
+                    })  
+                    response.nosql = result
+                }
             }
         ).then(dealerUpdated=> {
             response.nosql = dealerUpdated
