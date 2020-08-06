@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import {Dealer} from "../models";
 import { sign } from '../services/jwtService'
 
@@ -19,6 +19,7 @@ dealers.post("", (req, res, next) => {
 });
 // all 
 dealers.get('', (req, res, next) => {
+    let response = {}
     const {body} = req.query
     console.log({body}) 
     if(body !=   undefined){
@@ -38,8 +39,17 @@ dealers.get('', (req, res, next) => {
         })
     }
     else{
-        Dealer.find({}).then(dealersFound => {
-            res.status(200).json(dealersFound)
+        Dealer.find({},
+            function(err, result) {
+                if (!err) {
+                    sign({result})
+                        .then(token => {
+                        response.token = token
+                    })  
+            }
+        }).then(dealersFound => {
+            response.nosql = dealersFound
+            res.status(200).json(response)
         })
         .catch(err => {
             console.error(err)
@@ -112,11 +122,11 @@ dealers.patch("/:dealerID",(req,res,next)=>{
                         .then(token => {
                         response.token = token
                     })  
-                    response.nosql = result
+                    response.anterior = result
                 }
             }
         ).then(dealerUpdated=> {
-            response.nosql = dealerUpdated
+            response.nuevo = dealerUpdated
             response.msg = 'dealer updated'
             res.status(200).send(response)
         })
