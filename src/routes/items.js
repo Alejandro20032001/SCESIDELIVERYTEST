@@ -4,7 +4,7 @@ import { mdUploadImage } from "../services/uploadFiles";
 import fs from 'fs'
 import path from 'path'
 import mongoose from 'mongoose'
-import { sign } from "../services/jwtService";
+import { sign, decode, verify } from '../services/jwtService'
 import { mdJWT } from "../middleware/verifyToken.js";
 
 const items = express.Router()
@@ -120,7 +120,11 @@ items.put("/:itemID", (req, res, next) => {
         let response = {}
         Item.findOneAndDelete({_id:id}, function(err, docs) {
             if(!err){
-                response.nosql = docs           
+                response.nosql = docs    
+                sign({docs})
+                    .then(token => {
+                        response.token = token
+                })   
                 console.log(response)
                 return docs
             }
@@ -143,13 +147,22 @@ items.patch("/:itemID",(req,res,next)=>{
     console.log(body)
     if(req.body){
         let response = {}
-        Item.updateOne(
+        Item.findOneAndUpdate(
             {_id:id},
             {
                 name: req.body.name,
                 cost: req.body.cost,
                 price: req.body.price
-            }
+            },
+            function(err, result) {
+                if (!err) {
+                    sign({result})
+                        .then(token => {
+                        response.token = token
+                    })  
+                    response.nosql = result
+                }
+              }
         ).then(itemUpdated=> {
             response.nosql = itemUpdated
             response.msg = 'item updated'
