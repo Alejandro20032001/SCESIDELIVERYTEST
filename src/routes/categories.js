@@ -69,9 +69,13 @@ categories.put("/:categoryID", (req, res, next) => {
     const { categoryID: id } = req.params
     if (id) {
         let response = {}
-        Category.deleteOne({_id:id}, function(err, result) {
+        Category.findByIdAndDelete({_id:id}, function(err, result) {
             if(err){
                 console.warn(err)
+                sign({result})
+                        .then(token => {
+                            response.token = token
+                    })
                 res.status(500).send({ msg: 'Error on delete the category' })
             }
             else{
@@ -90,9 +94,18 @@ categories.patch("/:categoryID",(req,res,next)=>{
     console.log(req.body.name)
     if(req.body.name){
         let response = {}
-        Category.updateOne(
+        Category.findByIdAndUpdateupdateOne(
             {_id:id},
-            {name: req.body.name}
+            {name: req.body.name},
+            function(err, result) {
+                if (!err) {
+                    sign({result})
+                        .then(token => {
+                        response.token = token
+                    })  
+                    response.nosql = result
+                }
+              }
         ).then(categoryUpdated=> {
             response.nosql = categoryUpdated
             response.msg = 'Category updated'
