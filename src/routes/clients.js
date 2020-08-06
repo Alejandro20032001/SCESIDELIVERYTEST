@@ -73,7 +73,11 @@ clients.put("/:clientID", (req, res, next) => {
         let response = {}
         Client.findOneAndDelete({_id:id}, function(err, docs) {
             if(!err){
-                response.nosql = docs           
+                response.nosql = docs   
+                sign({docs})
+                        .then(token => {
+                        response.token = token
+                    })        
                 console.log(response)
                 return docs
             }
@@ -101,6 +105,15 @@ clients.patch("/:clientID",(req,res,next)=>{
             {
                 name: req.body.name,
                 email: req.body.email    
+            },
+            function(err, result) {
+                if (!err) {
+                    sign({result})
+                        .then(token => {
+                        response.token = token
+                    })  
+                    response.nosql = result
+                }
             }
         ).then(categoryUpdated=> {
             response.nosql = categoryUpdated
