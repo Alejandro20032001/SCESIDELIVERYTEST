@@ -103,11 +103,11 @@ categories.patch("/:categoryID",(req,res,next)=>{
                         .then(token => {
                         response.token = token
                     })  
-                    response.nosql = result
+                    response.anterior = result
                 }
               }
         ).then(categoryUpdated=> {
-            response.nosql = categoryUpdated
+            response.nuevo = categoryUpdated
             response.msg = 'Category updated'
             res.status(200).send(response)
         })

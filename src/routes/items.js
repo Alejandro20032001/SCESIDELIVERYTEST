@@ -4,7 +4,7 @@ import { mdUploadImage } from "../services/uploadFiles";
 import fs from 'fs'
 import path from 'path'
 import mongoose from 'mongoose'
-import { sign, decode, verify } from '../services/jwtService'
+import { sign} from '../services/jwtService'
 import { mdJWT } from "../middleware/verifyToken.js";
 
 const items = express.Router()
@@ -163,11 +163,11 @@ items.patch("/:itemID",(req,res,next)=>{
                         .then(token => {
                         response.token = token
                     })  
-                    response.nosql = result
+                    response.anterior = result
                 }
               }
         ).then(itemUpdated=> {
-            response.nosql = itemUpdated
+            response.nuevo = itemUpdated
             response.msg = 'item updated'
             res.status(200).send(response)
         })
