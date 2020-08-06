@@ -20,6 +20,7 @@ clients.post("", (req, res, next) => {
 // all // token
 clients.get('', (req, res, next) => {
     const {body} = req.query
+    let response = {}
     console.log({body})
     if(body !=   undefined){
         const {clientName} = req.query
@@ -38,8 +39,21 @@ clients.get('', (req, res, next) => {
         })
     }
     else{
-        Client.find({}).then(clientsFound => {
-            res.status(200).json(clientsFound)
+        Client.find({},
+            function(err, result) {
+                if (!err) {
+                    sign({result})
+                        .then(token => {
+                        response.token = token
+                    })  
+                }
+            }).then(clientsFound => {
+                sign({clientFound})
+                        .then(token => {
+                        response.token = token
+                    })  
+                response.nosql = clientsFound
+                res.status(200).json(response)
         })
         .catch(err => {
             console.error(err)
