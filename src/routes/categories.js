@@ -38,7 +38,7 @@ categories.get('', (req, res, next) => {
         })
     }
     else{
-        Category.find({}).then(categoriesFound => {
+        Category.find({}).isDelete(false).then(categoriesFound => {
             res.status(200).json(categoriesFound)
         })
         .catch(err => {
@@ -51,7 +51,7 @@ categories.get('/:categoryID', (req, res, next) => {
     const { categoryID: id } = req.params
     Category.findOne({
         _id: id
-    })
+    }).isDelete(false)
     .then(categoryFound => {
         if (categoryFound){
             res.status(200).json(categoryFound)
@@ -70,23 +70,31 @@ categories.put("/:categoryID", (req, res, next) => {
     const { categoryID: id } = req.params
     if (id) {
         let response = {}
-        Category.findByIdAndDelete({_id:id}, function(err, result) {
-            if(err){
-                console.warn(err)
-                res.status(500).send({ msg: 'Error on delete the category' })
+        Category.findOne({
+            _id: id
+        }).isDeleted(false)
+        .then(categoryFound => {
+            if (categoryFound){
+                categoryFound.softdelete(function(err) {
+                    if (err) { res.json(err) }  
+                  });
+                console.log("si se borro")
+                res.status(200).json(categoryFound)
             }
             else{
-                response.nosql = result
-                response.msg = 'Category delete'
-                res.status(200).send(result)
+                res.status(404).json({ msg: 'No found store' })
             }
-        });
+        })
+        .catch(err => {
+            console.error(err)
+            res.status(500).json(err)
+        })
     } else{
         res.status(400).send({ msg: 'No data' })
     }
 });
 //actualizado en cascada
-categories.patch("/:categoryID", (req,res,next)=>{
+categories.patch("/:categoryID", (req,res,next)=>{ 
     const{ categoryID : id} = req.params
     console.log(req.body.name)
     if(req.body.name){
@@ -99,7 +107,8 @@ categories.patch("/:categoryID", (req,res,next)=>{
                     response.anterior = result
                 }
               }
-        ).then(categoryUpdated=> {
+        ).isDelete(false)
+        .then(categoryUpdated=> {
             response.nuevo = categoryUpdated
             response.msg = 'Category updated'
             res.status(200).send(response)
