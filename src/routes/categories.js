@@ -38,7 +38,7 @@ categories.get('', (req, res, next) => {
         })
     }
     else{
-        Category.find({}).isDelete(false).then(categoriesFound => {
+        Category.find({}).isDeleted(false).then(categoriesFound => {
             res.status(200).json(categoriesFound)
         })
         .catch(err => {
@@ -51,7 +51,7 @@ categories.get('/:categoryID', (req, res, next) => {
     const { categoryID: id } = req.params
     Category.findOne({
         _id: id
-    }).isDelete(false)
+    }).isDeleted(false)
     .then(categoryFound => {
         if (categoryFound){
             res.status(200).json(categoryFound)
@@ -107,7 +107,7 @@ categories.patch("/:categoryID", (req,res,next)=>{
                     response.anterior = result
                 }
               }
-        ).isDelete(false)
+        ).isDeleted(false)
         .then(categoryUpdated=> {
             response.nuevo = categoryUpdated
             response.msg = 'Category updated'
