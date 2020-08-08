@@ -39,7 +39,7 @@ dealers.get('', (req, res, next) => {
         })
     }
     else{
-        Dealer.find({})
+        Dealer.find({}).isDeleted(false)
         .then(dealersFound => {
             response.nosql = dealersFound
             res.status(200).json(response)
@@ -55,7 +55,7 @@ dealers.get('/:dealerID', (req, res, next) => {
     const { dealerID: id } = req.params
     Dealer.findOne({
         _id: id
-    })
+    }).isDeleted(false)
     .then(dealerFound => {
         if (dealerFound){
             res.status(200).json(dealerFound)
@@ -74,18 +74,24 @@ dealers.put("/:dealerID", (req, res, next) => {
     const { dealerID: id } = req.params
     if (id) {
         let response = {}
-        Dealer.findByIdAndDelete({_id:id}, function(err, docs) {
-            if(!err){
-                response.nosql = docs    
-                return docs
+        Dealer.findOne({
+            _id: id
+        }).isDeleted(false)
+        .then(dealerFound => {
+            if (dealerFound){
+                dealerFound.softdelete(function(err) {
+                    if (err) { res.json(err) }  
+                  });
+                console.log("si se borro")
+                res.status(200).json(dealerFound)
             }
-        }).then(() => {
-            response.msg = 'Dealer delete'
-            res.status(200).send(response)
+            else{
+                res.status(404).json({ msg: 'No found store' })
+            }
         })
         .catch(err => {
-            console.warn(err)
-            res.status(500).send({ msg: 'Error on delete the dealer' })
+            console.error(err)
+            res.status(500).json(err)
         })
     } else{
         res.status(400).send({ msg: 'No data' })
@@ -107,7 +113,8 @@ dealers.patch("/:dealerID",(req,res,next)=>{
             function(err, result) { 
                     response.anterior = result
             }
-        ).then(dealerUpdated=> {
+        ).isDeleted(false)
+        .then(dealerUpdated=> {
             response.nuevo = dealerUpdated
             response.msg = 'dealer updated'
             res.status(200).send(response)
