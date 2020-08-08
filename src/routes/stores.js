@@ -51,6 +51,20 @@ stores.get('', (req, res, next) => {
 
 stores.get('/:storeID', (req, res, next) => {
     const { storeID: id } = req.params
+    Store.find({_id: id}).isDeleted(false)
+    .then(storeFound => {
+        if (storeFound){
+            res.status(200).json(storeFound)
+        }
+        else{
+            res.status(404).json({ msg: 'No found store' })
+        }
+    })
+    .catch(err => {
+        console.error(err)
+        res.status(500).json(err)
+    })
+    /*
     Store.findOne({
         _id: id
     })
@@ -65,7 +79,7 @@ stores.get('/:storeID', (req, res, next) => {
     .catch(err => {
         console.error(err)
         res.status(500).json(err)
-    })
+    })*/
 }) 
 // borrado en cascada............... borrar items?
 stores.put("/:storeID",(req, res, next) => {
