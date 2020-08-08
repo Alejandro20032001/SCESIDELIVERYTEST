@@ -4,7 +4,7 @@ import { mdUploadImage } from "../services/uploadFiles";
 import fs from 'fs'
 import path from 'path'
 import mongoose from 'mongoose'
-import { sign} from '../services/jwtService'
+import {sign} from '../services/jwtService'
 import { mdJWT } from "../middleware/verifyToken.js";
 
 const items = express.Router()
@@ -14,44 +14,40 @@ items.post("", (req, res, next) => {
     const categoryId = req.body.category
     const storeId = req.body.store
     console.log(body);
-    Promise.all([
-        Item.create({
-            name: req.body.name,
-            category:
-                    mongoose.Types.ObjectId(categoryId),
-            store:
-                    mongoose.Types.ObjectId(storeId),
-            cost: req.body.cost,            
-            price: req.body.price
-        }),
-        Store.updateOne({_id:storeId},
-        {
-            $addToSet: {
-                items:
-                    mongoose.Types.ObjectId(req.body.store)
-            }
-        }),
-        Category.updateOne({_id:categoryId},
-        {
-            $addToSet: {
-                items:
-                    mongoose.Types.ObjectId(req.body.category)
-            }
-        })
-
-    ])
+    Item.create({
+        name: req.body.name,
+        category:
+                mongoose.Types.ObjectId(categoryId),
+        store:
+                mongoose.Types.ObjectId(storeId),
+        cost: req.body.cost,            
+        price: req.body.price
+    }).then (itemCreated =>
+        Promise.all([
+            Store.updateOne({_id:storeId},
+            {
+                addToSet: {
+                    items: itemCreated._id
+                }
+            }),
+            Category.updateOne({_id:categoryId},
+            {
+                $addToSet: {
+                    items: itemCreated._id
+                }
+            })
+        ]))
     .then(itemCreated => {
-            res.nosql = itemCreated
+            res.item = itemCreated
             res.msg = 'item created'
             res.status(201).json(itemCreated)
     })
     .catch(err => {
         res.status(500).json(err)
     })
-    
 });
 // all 
-items.get('', (req, res, next) => {
+items.get('', mdJWT,(req, res, next) => {
     const {body} = req.query
     console.log({body}) 
     if(body !=   undefined){
@@ -122,10 +118,6 @@ items.put("/:itemID", (req, res, next) => {
             Item.findOneAndDelete({_id:id}, function(err, docs) {
                 if(!err){
                     response.nosql = docs    
-                    sign({docs})
-                        .then(token => {
-                            response.token = token
-                    })   
                     console.log(response)
                     return docs
                 }
@@ -144,7 +136,7 @@ items.put("/:itemID", (req, res, next) => {
     }
 });
 //actualizado en cascada
-items.patch("/:itemID",(req,res,next)=>{
+items.patch("/:itemID",mdJWT,(req,res,next)=>{
     const{ itemID : id} = req.params
     const {body} = req
     console.log(body)
@@ -159,10 +151,6 @@ items.patch("/:itemID",(req,res,next)=>{
             },
             function(err, result) {
                 if (!err) {
-                    sign({result})
-                        .then(token => {
-                        response.token = token
-                    })  
                     response.anterior = result
                 }
               }
@@ -180,7 +168,7 @@ items.patch("/:itemID",(req,res,next)=>{
     }
 })
 
-items.post('/upload-image/:itemID', mdUploadImage, (req, res) => {
+items.post('/upload-image/:itemID', mdUploadImage, mdJWT,(req, res) => {
     console.dir(req.files)
     const { itemID } = req.params
     const { path: image } = req.files.image
@@ -200,7 +188,7 @@ items.post('/upload-image/:itemID', mdUploadImage, (req, res) => {
         })
 })
 
-items.get('/get-image/:image', (req, res) => {
+items.get('/get-image/:image', mdJWT,(req, res) => {
     console.dir(req.files)
     const { image } = req.params
     const pathFile = `uploads/items/${image}`;

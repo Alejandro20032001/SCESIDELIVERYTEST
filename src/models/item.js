@@ -28,6 +28,10 @@ const ItemSchema = new Schema({
         index: true,
         required: true
     },
+    description: {
+        type: String,
+        required: true
+    },
     images: [String]
 })
 

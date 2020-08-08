@@ -3,7 +3,6 @@ import swaggerUi from 'swagger-ui-express'
 import YAML from 'yamljs'
 import {PORT,URLDB} from './env'
 
-
 import categories from './routes/categories'
 import clients from './routes/clients'
 import dealers from './routes/dealers'
@@ -17,9 +16,7 @@ const swaggerDocument = YAML.load('./docs/swagger.yaml');
 // getting-started.js MongoDb
 import mongoose from 'mongoose'
 mongoose.Promise = bluebird
-
 mongoose.connect(URLDB, { useNewUrlParser: true });
-
 
 const app = express()
 app.use(cors({

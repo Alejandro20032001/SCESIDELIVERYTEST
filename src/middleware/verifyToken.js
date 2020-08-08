@@ -6,6 +6,7 @@ const mdJWT = (req, res, next) => {
         verify(token)
             .then(decoded => {
                 console.dir({ decoded }, { colors: true })
+                decoded._id
                 next()
             })
             .catch(err => {

@@ -39,15 +39,8 @@ dealers.get('', (req, res, next) => {
         })
     }
     else{
-        Dealer.find({},
-            function(err, result) {
-                if (!err) {
-                    sign({result})
-                        .then(token => {
-                        response.token = token
-                    })  
-            }
-        }).then(dealersFound => {
+        Dealer.find({})
+        .then(dealersFound => {
             response.nosql = dealersFound
             res.status(200).json(response)
         })
@@ -83,12 +76,7 @@ dealers.put("/:dealerID", (req, res, next) => {
         let response = {}
         Dealer.findByIdAndDelete({_id:id}, function(err, docs) {
             if(!err){
-                response.nosql = docs  
-                sign({result})
-                        .then(token => {
-                        response.token = token
-                    })          
-                console.log(response)
+                response.nosql = docs    
                 return docs
             }
         }).then(() => {
@@ -116,14 +104,8 @@ dealers.patch("/:dealerID",(req,res,next)=>{
                 name: req.body.name,
                 email: req.body.email    
             },
-            function(err, result) {
-                if (!err) {
-                    sign({result})
-                        .then(token => {
-                        response.token = token
-                    })  
+            function(err, result) { 
                     response.anterior = result
-                }
             }
         ).then(dealerUpdated=> {
             response.nuevo = dealerUpdated

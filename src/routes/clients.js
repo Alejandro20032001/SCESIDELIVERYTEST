@@ -39,19 +39,8 @@ clients.get('', (req, res, next) => {
         })
     }
     else{
-        Client.find({},
-            function(err, result) {
-                if (!err) {
-                    sign({result})
-                        .then(token => {
-                        response.token = token
-                    })  
-                }
-            }).then(clientsFound => {
-                sign({clientFound})
-                        .then(token => {
-                        response.token = token
-                    })  
+        Client.find({})
+            .then(clientsFound => {
                 response.nosql = clientsFound
                 res.status(200).json(response)
         })
@@ -87,11 +76,7 @@ clients.put("/:clientID", (req, res, next) => {
         let response = {}
         Client.findOneAndDelete({_id:id}, function(err, docs) {
             if(!err){
-                response.nosql = docs   
-                sign({docs})
-                        .then(token => {
-                        response.token = token
-                    })        
+                response.nosql = docs 
                 console.log(response)
                 return docs
             }
@@ -114,7 +99,7 @@ clients.patch("/:clientID",(req,res,next)=>{
     console.log(body)
     if(req.body){
         let response = {}
-        Client.updateOne(
+        Client.findByIdAndUpdate(
             {_id:id},
             {
                 name: req.body.name,
@@ -122,10 +107,6 @@ clients.patch("/:clientID",(req,res,next)=>{
             },
             function(err, result) {
                 if (!err) {
-                    sign({result})
-                        .then(token => {
-                        response.token = token
-                    })  
                     response.anterior = result
                 }
             }

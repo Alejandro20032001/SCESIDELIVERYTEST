@@ -1,6 +1,7 @@
 import express from "express";
 import {Category} from "../models";
 import { sign } from '../services/jwtService'
+import { mdJWT } from "../middleware/verifyToken";
 const categories = express.Router()
 
 categories.post("", (req, res, next) => {
@@ -72,10 +73,6 @@ categories.put("/:categoryID", (req, res, next) => {
         Category.findByIdAndDelete({_id:id}, function(err, result) {
             if(err){
                 console.warn(err)
-                sign({result})
-                        .then(token => {
-                            response.token = token
-                    })
                 res.status(500).send({ msg: 'Error on delete the category' })
             }
             else{
@@ -89,20 +86,16 @@ categories.put("/:categoryID", (req, res, next) => {
     }
 });
 //actualizado en cascada
-categories.patch("/:categoryID",(req,res,next)=>{
+categories.patch("/:categoryID", (req,res,next)=>{
     const{ categoryID : id} = req.params
     console.log(req.body.name)
     if(req.body.name){
         let response = {}
-        Category.findByIdAndUpdateupdateOne(
+        Category.findByIdAndUpdate(
             {_id:id},
             {name: req.body.name},
             function(err, result) {
                 if (!err) {
-                    sign({result})
-                        .then(token => {
-                        response.token = token
-                    })  
                     response.anterior = result
                 }
               }
