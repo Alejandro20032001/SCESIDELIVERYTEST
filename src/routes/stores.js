@@ -1,8 +1,9 @@
 import express from "express";
 import {Store} from "../models";
-import { sign } from '../services/jwtService'
+import { mdJWT } from "../middleware/verifyToken";
 
 const stores = express.Router()
+
 
 stores.post("", (req, res, next) => {
     const { body } = req
@@ -67,17 +68,32 @@ stores.get('/:storeID', (req, res, next) => {
     })
 }) 
 // borrado en cascada............... borrar items?
-stores.put("/:storeID", (req, res, next) => {
+stores.put("/:storeID",(req, res, next) => {
     const { storeID: id } = req.params
     if (id) {
         let response = {}
+        Store.findOne({
+            _id: id
+        })
+        .then(storeFound => {
+            if (storeFound){
+                storeFound.softdelete(function(err, newTest) {
+                    if (err) { res.json(err) }  
+                  });
+                console.log("si se borro")
+                res.status(200).json(storeFound)
+            }
+            else{
+                res.status(404).json({ msg: 'No found store' })
+            }
+        })
+        .catch(err => {
+            console.error(err)
+            res.status(500).json(err)
+        })/*
         Store.findByIdAndDelete({_id:id}, function(err, docs) {
             if(!err){
-                response.nosql = docs   
-                sign({docs})
-                        .then(token => {
-                        response.token = token
-                    })          
+                response.nosql = docs         
                 console.log(response)
                 return docs
             }
@@ -88,16 +104,21 @@ stores.put("/:storeID", (req, res, next) => {
         .catch(err => {
             console.warn(err)
             res.status(500).send({ msg: 'Error on delete the store' })
-        })
+        })*/
     } else{
         res.status(400).send({ msg: 'No data' })
     }
+});
+stores.get("/get/info/", mdJWT, (req, response) => {
+    response.status(200).json({
+        msg: 'ok'
+    })
 });
 //actualizado en cascada
 stores.patch("/:storeID",(req,res,next)=>{
     const{ storeID : id} = req.params
     const {body} = req
-    console.log(body)
+    //console.log(body)
     if(req.body){
         let response = {}
         Store.findByIdAndUpdate(
@@ -107,13 +128,9 @@ stores.patch("/:storeID",(req,res,next)=>{
             },
             function(err, result) {
                 if (!err) {
-                    sign({result})
-                        .then(token => {
-                        response.token = token
-                    })  
                     response.anterior = result
                 }
-              }
+            }
         ).then(storeUpdated=> {
             response.nuevo = storeUpdated
             response.msg = 'store updated'
