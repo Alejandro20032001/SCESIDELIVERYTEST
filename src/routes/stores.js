@@ -71,13 +71,12 @@ stores.put("/:storeID",(req, res, next) => {
         let response = {}
         Store.findOne({
             _id: id
-        }).isDeleted(false)
+        })
         .then(storeFound => {
             if (storeFound){
-                storeFound.softdelete(function(err) {
+                storeFound.softdelete(function(err,newTest) {
                     if (err) { res.json(err) }  
                   });
-                console.log("si se borro")
                 res.status(200).json(storeFound)
             }
             else{
