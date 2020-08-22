@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose'
 const ClientSchema = new Schema({
+    uid: String,
     name: {
         type: String,
         index: true,
