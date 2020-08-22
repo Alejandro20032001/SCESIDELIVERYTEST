@@ -25,7 +25,7 @@ categories.get('', (req, res, next) => {
         const {categoryName} = req.query
         Category.findOne({
             name: categoryName
-        })
+        }).isDeleted(false)
         .then(categoryFound => {
             if (categoryFound)
                 res.status(200).json(categoryFound)
@@ -72,7 +72,7 @@ categories.put("/:categoryID", (req, res, next) => {
         let response = {}
         Category.findOne({
             _id: id
-        }).isDeleted(false)
+        })
         .then(categoryFound => {
             if (categoryFound){
                 categoryFound.softdelete(function(err) {
