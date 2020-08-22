@@ -6,7 +6,7 @@ const dealers = express.Router()
 
 dealers.post("", (req, res, next) => {
     const { body } = req
-    console.log(body);
+    g(body);
     Dealer.create(body)
         .then(dealerCreated => {
             res.nosql = dealerCreated
@@ -21,7 +21,6 @@ dealers.post("", (req, res, next) => {
 dealers.get('', (req, res, next) => {
     let response = {}
     const {body} = req.query
-    console.log({body}) 
     if(body !=   undefined){
         const {dealerName} = req.query
         Dealer.findOne({
@@ -76,13 +75,12 @@ dealers.put("/:dealerID", (req, res, next) => {
         let response = {}
         Dealer.findOne({
             _id: id
-        }).isDeleted(false)
+        })
         .then(dealerFound => {
             if (dealerFound){
                 dealerFound.softdelete(function(err) {
                     if (err) { res.json(err) }  
                   });
-                console.log("si se borro")
                 res.status(200).json(dealerFound)
             }
             else{
@@ -101,7 +99,6 @@ dealers.put("/:dealerID", (req, res, next) => {
 dealers.patch("/:dealerID",(req,res,next)=>{
     const{ dealerID : id} = req.params
     const {body} = req
-    console.log(body)
     if(req.body){
         let response = {}
         Dealer.findByIdAndUpdate(

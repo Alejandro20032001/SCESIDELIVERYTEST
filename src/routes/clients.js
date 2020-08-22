@@ -1,4 +1,5 @@
-import express from "express";
+import express from "express";  // imports reorganizados
+
 import {Client} from "../models";
 import { sign } from '../services/jwtService'
 
@@ -6,7 +7,6 @@ const clients = express.Router()
 
 clients.post("", (req, res, next) => {
     const { body } = req
-    console.log(body);
     Client.create(body)
         .then(clientCreated => {
             res.nosql = clientCreated
@@ -21,7 +21,6 @@ clients.post("", (req, res, next) => {
 clients.get('', (req, res, next) => {
     const {body} = req.query
     let response = {}
-    console.log({body})
     if(body !=   undefined){
         const {clientName} = req.query
         Client.findOne({
@@ -82,7 +81,6 @@ clients.put("/:clientID", (req, res, next) => {
                 clientFound.softdelete(function(err) {
                     if (err) { res.json(err) }  
                   });
-                console.log("si se borro")
                 res.status(200).json(clientFound)
             }
             else{
@@ -101,11 +99,12 @@ clients.put("/:clientID", (req, res, next) => {
 clients.patch("/:clientID",(req,res,next)=>{
     const{ clientID : id} = req.params
     const {body} = req
-    console.log(body)
     if(req.body){
-        let response = {}
+        let response = {}//identado id
         Client.findByIdAndUpdate(
-            {_id:id},
+            {
+                _id:id
+            },
             {
                 name: req.body.name,
                 email: req.body.email    
@@ -115,7 +114,8 @@ clients.patch("/:clientID",(req,res,next)=>{
                     response.anterior = result
                 }
             }
-        ).isDeleted(false)
+        )
+        .isDeleted(false)//isDelete bajado 
         .then(categoryUpdated=> {
             response.nuevo = categoryUpdated
             response.msg = 'Client updated'

@@ -2,11 +2,12 @@ import express from "express";
 import {Category} from "../models";
 import { sign } from '../services/jwtService'
 import { mdJWT } from "../middleware/verifyToken";
+
+// linea aumenta 
 const categories = express.Router()
 
 categories.post("", (req, res, next) => {
     const {body} = req
-    console.log(body);
     Category.create(body)
         .then(categoryCreated => {
             res.nosql = categoryCreated
@@ -20,12 +21,12 @@ categories.post("", (req, res, next) => {
 // all 
 categories.get('', (req, res, next) => {    
     const {body} = req.query
-    console.log({body})
     if(body !=  undefined){
         const {categoryName} = req.query
         Category.findOne({
             name: categoryName
-        }).isDeleted(false)
+        })
+        .isDeleted(false)//isDelete bajado
         .then(categoryFound => {
             if (categoryFound)
                 res.status(200).json(categoryFound)
@@ -51,7 +52,8 @@ categories.get('/:categoryID', (req, res, next) => {
     const { categoryID: id } = req.params
     Category.findOne({
         _id: id
-    }).isDeleted(false)
+    })
+    .isDeleted(false)//isDelete bajado
     .then(categoryFound => {
         if (categoryFound){
             res.status(200).json(categoryFound)
@@ -78,7 +80,6 @@ categories.put("/:categoryID", (req, res, next) => {
                 categoryFound.softdelete(function(err) {
                     if (err) { res.json(err) }  
                   });
-                console.log("si se borro")
                 res.status(200).json(categoryFound)
             }
             else{
@@ -96,7 +97,6 @@ categories.put("/:categoryID", (req, res, next) => {
 //actualizado en cascada
 categories.patch("/:categoryID", (req,res,next)=>{ 
     const{ categoryID : id} = req.params
-    console.log(req.body.name)
     if(req.body.name){
         let response = {}
         Category.findByIdAndUpdate(
@@ -107,7 +107,8 @@ categories.patch("/:categoryID", (req,res,next)=>{
                     response.anterior = result
                 }
               }
-        ).isDeleted(false)
+        )
+        .isDeleted(false)//isDelete bajado
         .then(categoryUpdated=> {
             response.nuevo = categoryUpdated
             response.msg = 'Category updated'

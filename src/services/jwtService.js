@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { SECRET as secret } from '../env'
 
-const minutes = 180;
-
+const minutes = 180;//espacio borrado
 const sign = (payload) => {
     const token = jwt.sign({
         exp: Math.floor(Date.now() / 1000) + (60 * minutes),

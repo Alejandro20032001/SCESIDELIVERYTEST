@@ -1,13 +1,13 @@
 import express from "express";
+
 import {Store} from "../models";
 import { mdJWT } from "../middleware/verifyToken";
 
+//imports reorganizados
 const stores = express.Router()
-
 
 stores.post("", (req, res, next) => {
     const { body } = req
-    console.log(body);
     Store.create(body)
         .then(storeCreated => {
             res.nosql = storeCreated
@@ -21,10 +21,14 @@ stores.post("", (req, res, next) => {
 // all 
 stores.get('', (req, res, next) => {
     const {body} = req.query
-    console.log({body}) 
     if(body !=   undefined){
         const {storeName} = req.query
-        Store.findOne({name: storeName}).isDeleted(false)
+        Store.findOne(
+            {
+                name: storeName//identado
+            }
+        )
+        .isDeleted(false)//en nueva linea
         .then(storeFound => {
             if (storeFound)
                 res.status(200).json(storeFound)
@@ -37,7 +41,8 @@ stores.get('', (req, res, next) => {
         })
     }
     else{
-        Store.find({}).isDeleted(false)
+        Store.find({})
+        .isDeleted(false)//en nueva linea
         .then(storesFound => {
             res.status(200).json(storesFound)
         })
@@ -50,7 +55,8 @@ stores.get('', (req, res, next) => {
 
 stores.get('/:storeID', (req, res, next) => {
     const { storeID: id } = req.params
-    Store.find({_id: id}).isDeleted(false)
+    Store.find({_id: id})
+    .isDeleted(false)//en nueva linea
     .then(storeFound => {
         if (storeFound){
             res.status(200).json(storeFound)
@@ -92,21 +98,25 @@ stores.put("/:storeID",(req, res, next) => {
     }
 });
 //actualizado en cascada
-stores.patch("/:storeID",(req,res,next)=>{
+stores.patch("/:storeID",(req, res, next)=>{
     const{ storeID : id} = req.params
     const {body} = req
-    console.log(body)
     if(req.body){
         let response = {}
         Store.findByIdAndUpdate(
-            {_id:id},
-            {name: req.body.name},
-            function(err, result) {
+            {
+                _id:id//identado
+            },
+            {
+                name: req.body.name
+            }
+            ,function(err, result) {
                 if (!err) {
                     response.anterior = result
                 }
             }
-        ).isDeleted(false)
+        )
+        .isDeleted(false)//en nueva linea
         .then(storeUpdated=> {
             response.nuevo = storeUpdated
             response.msg = 'store updated'

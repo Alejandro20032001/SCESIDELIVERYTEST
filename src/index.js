@@ -1,22 +1,24 @@
 import express from 'express'
 import swaggerUi from 'swagger-ui-express'
 import YAML from 'yamljs'
-import {PORT,URLDB} from './env'
+import cors from 'cors'
+import bluebird from "bluebird";
+import mongoose from 'mongoose'
 
+//imports organizados en librerias y exportaciones 
+import {PORT , URL_DB} from './env'
 import categories from './routes/categories'
 import clients from './routes/clients'
 import dealers from './routes/dealers'
 import stores from './routes/stores'
 import items from './routes/items'
 
-import cors from 'cors'
-import bluebird from "bluebird";
 const swaggerDocument = YAML.load('./docs/swagger.yaml');
 
 // getting-started.js MongoDb
-import mongoose from 'mongoose'
+
 mongoose.Promise = bluebird
-mongoose.connect(URLDB, { useNewUrlParser: true });
+mongoose.connect(URL_DB, { useNewUrlParser: true });
 
 const app = express()
 app.use(cors({
