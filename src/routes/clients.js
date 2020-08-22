@@ -26,7 +26,7 @@ clients.get('', (req, res, next) => {
         const {clientName} = req.query
         Client.findOne({
             name: clientName
-        })
+        }).isDeleted(false)
         .then(clientFound => {
             if (clientFound)
                 res.status(200).json(clientFound)
@@ -39,7 +39,7 @@ clients.get('', (req, res, next) => {
         })
     }
     else{
-        Client.find({})
+        Client.find({}).isDeleted(false)
             .then(clientsFound => {
                 response.nosql = clientsFound
                 res.status(200).json(response)
@@ -55,7 +55,7 @@ clients.get('/:clientID', (req, res, next) => {
     const { categoryID: id } = req.params
     Client.findOne({
         _id: id
-    })
+    }).isDeleted(false)
     .then(clientFound => {
         if (clientFound){
             res.status(200).json(clientFound)
@@ -74,19 +74,24 @@ clients.put("/:clientID", (req, res, next) => {
     const { clientID: id } = req.params
     if (id) {
         let response = {}
-        Client.findOneAndDelete({_id:id}, function(err, docs) {
-            if(!err){
-                response.nosql = docs 
-                console.log(response)
-                return docs
+        Client.findOne({
+            _id: id
+        })
+        .then(clientFound => {
+            if (clientFound){
+                clientFound.softdelete(function(err) {
+                    if (err) { res.json(err) }  
+                  });
+                console.log("si se borro")
+                res.status(200).json(clientFound)
             }
-        }).then(() => {
-            response.msg = 'Client delete'
-            res.status(200).send(response)
+            else{
+                res.status(404).json({ msg: 'No found store' })
+            }
         })
         .catch(err => {
-            console.warn(err)
-            res.status(500).send({ msg: 'Error on delete the client' })
+            console.error(err)
+            res.status(500).json(err)
         })
     } else{
         res.status(400).send({ msg: 'No data' })
@@ -110,7 +115,8 @@ clients.patch("/:clientID",(req,res,next)=>{
                     response.anterior = result
                 }
             }
-        ).then(categoryUpdated=> {
+        ).isDeleted(false)
+        .then(categoryUpdated=> {
             response.nuevo = categoryUpdated
             response.msg = 'Client updated'
             res.status(200).send(response)
