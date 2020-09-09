@@ -6,6 +6,11 @@ import { mdJWT } from "../middleware/verifyToken";
 // linea aumenta 
 const categories = express.Router()
 
+categories.get("/", (req, response) => {
+    response.status(200).json({
+        msg: 'ok'
+    })
+});
 categories.post("", (req, res, next) => {
     const {body} = req
     Category.create(body)
