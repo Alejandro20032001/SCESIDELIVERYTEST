@@ -179,7 +179,6 @@ items.patch("/:itemID", (req, res, next)=>{
 })
 
 items.post('/upload-image/:itemID', mdUploadImage,(req, res) => {
-    console.dir(req.files)
     const { itemID } = req.params
     const { path: image } = req.files.image
     Item.findById(itemID)
@@ -199,7 +198,6 @@ items.post('/upload-image/:itemID', mdUploadImage,(req, res) => {
 })
 
 items.get('/get-image/:image',(req, res) => {
-    console.dir(req.files)
     const { image } = req.params
     const pathFile = `uploads/items/${image}`;
     if(fs.existsSync(pathFile))
