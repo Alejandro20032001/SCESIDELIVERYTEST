@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose'
-
+import soft_delete from 'mongoose-softdelete' 
 const ItemSchema = new Schema({
     name: {
         type: String,
@@ -31,5 +31,5 @@ const ItemSchema = new Schema({
     },
     images: [String]
 })
-
+ItemSchema.plugin(soft_delete)
 export default model('Items', ItemSchema)
