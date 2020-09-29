@@ -6,11 +6,6 @@ import { mdJWT } from "../middleware/verifyToken";
 // linea aumenta 
 const categories = express.Router()
 
-categories.get("/", (req, response) => {
-    response.status(200).json({
-        msg: 'ok'
-    })
-});
 categories.post("", (req, res, next) => {
     const {body} = req
     Category.create(body)
@@ -25,7 +20,7 @@ categories.post("", (req, res, next) => {
 });
 // all 
 categories.get('', (req, res, next) => {    
-    const {body} = req.query
+    const body = req.query.name
     if(body !=  undefined){
         const {categoryName} = req.query
         Category.findOne({
@@ -104,20 +99,29 @@ categories.patch("/:categoryID", (req,res,next)=>{
     const{ categoryID : id} = req.params
     if(req.body.name){
         let response = {}
-        Category.findByIdAndUpdate(
-            {_id:id},
-            {name: req.body.name},
-            function(err, result) {
-                if (!err) {
-                    response.anterior = result
-                }
-              }
-        )
+    
+        Category.findById(id)
         .isDeleted(false)//isDelete bajado
-        .then(categoryUpdated=> {
-            response.nuevo = categoryUpdated
-            response.msg = 'Category updated'
-            res.status(200).send(response)
+        .then(categoryFound=> {
+            
+            Category.findByIdAndUpdate(categoryFound, {name: req.body.name})
+            .then(categoryUpdated =>{
+                response.anterior = categoryFound
+                response.nuevo = categoryUpdated
+                if(categoryUpdated != undefined){
+                    
+                    response.msg = 'Category updated'
+                    res.status(200).send(response)   
+                }
+                else{
+                    response.msg = 'Category is delete'
+                    res.status(500).send(response)
+                }  
+            })
+            .catch(err => {
+                console.error(err)
+                res.status(500).json(err)
+            })
         })
         .catch(err => {
             console.warn(err)
@@ -126,5 +130,5 @@ categories.patch("/:categoryID", (req,res,next)=>{
     } else{
         res.status(400).send({ msg: 'No data' })
     }
-})
+});
 export default categories
