@@ -120,6 +120,7 @@ paths:
       responses:
         200:
           description: "Its ok"
+  
   /items/upload-image/{itemID}:
     post: 
       tags:

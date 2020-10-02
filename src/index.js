@@ -1,31 +1,29 @@
 import express from 'express'
 import swaggerUi from 'swagger-ui-express'
 import YAML from 'yamljs'
+import cors from 'cors'
+import bluebird from "bluebird";
+import mongoose from 'mongoose'
 
+//imports organizados en librerias y exportaciones 
+import {PORT , URL_DB} from './env'
 import categories from './routes/categories'
 import clients from './routes/clients'
 import dealers from './routes/dealers'
 import stores from './routes/stores'
 import items from './routes/items'
 
-import cors from 'cors'
-import bluebird from "bluebird";
 const swaggerDocument = YAML.load('./docs/swagger.yaml');
 
 // getting-started.js MongoDb
-import mongoose from 'mongoose'
-import { Items } from './models';
-mongoose.Promise = bluebird
-const schema = 'delivery'
-const urlDb = `mongodb://localhost/${schema}`;
-mongoose.connect(urlDb, { useNewUrlParser: true });
 
+mongoose.Promise = bluebird
+mongoose.connect(URL_DB, { useNewUrlParser: true });
 
 const app = express()
 app.use(cors({
     origin:['http://localhost:9090',
             'https://editor.swagger.io',
-            'http://app.swaggerhub.com'
     ],
     methods: ['GET', 'POST','PATCH','PUT']
 
@@ -53,4 +51,4 @@ app.use('/items', items);
 
 //app.use(exampleRoute)
 
-app.listen(9090, handler)
+app.listen(PORT, handler)

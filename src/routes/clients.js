@@ -1,12 +1,12 @@
-import express from "express";
-import {Client} from "../models";
+import express from "express";  // imports reorganizados
 
+import {Client} from "../models";
+import { sign } from '../services/jwtService'
 
 const clients = express.Router()
 
 clients.post("", (req, res, next) => {
     const { body } = req
-    console.log(body);
     Client.create(body)
         .then(clientCreated => {
             res.nosql = clientCreated
@@ -17,15 +17,15 @@ clients.post("", (req, res, next) => {
         res.status(500).json(err)
     })
 });
-// all 
+// all // token
 clients.get('', (req, res, next) => {
     const {body} = req.query
-    console.log({body})
+    let response = {}
     if(body !=   undefined){
         const {clientName} = req.query
         Client.findOne({
             name: clientName
-        })
+        }).isDeleted(false)
         .then(clientFound => {
             if (clientFound)
                 res.status(200).json(clientFound)
@@ -38,8 +38,10 @@ clients.get('', (req, res, next) => {
         })
     }
     else{
-        Client.find({}).then(clientsFound => {
-            res.status(200).json(clientsFound)
+        Client.find({}).isDeleted(false)
+            .then(clientsFound => {
+                response.nosql = clientsFound
+                res.status(200).json(response)
         })
         .catch(err => {
             console.error(err)
@@ -52,7 +54,7 @@ clients.get('/:clientID', (req, res, next) => {
     const { categoryID: id } = req.params
     Client.findOne({
         _id: id
-    })
+    }).isDeleted(false)
     .then(clientFound => {
         if (clientFound){
             res.status(200).json(clientFound)
@@ -71,19 +73,23 @@ clients.put("/:clientID", (req, res, next) => {
     const { clientID: id } = req.params
     if (id) {
         let response = {}
-        Client.findOneAndDelete({_id:id}, function(err, docs) {
-            if(!err){
-                response.nosql = docs           
-                console.log(response)
-                return docs
+        Client.findOne({
+            _id: id
+        })
+        .then(clientFound => {
+            if (clientFound){
+                clientFound.softdelete(function(err) {
+                    if (err) { res.json(err) }  
+                  });
+                res.status(200).json(clientFound)
             }
-        }).then(() => {
-            response.msg = 'Client delete'
-            res.status(200).send(response)
+            else{
+                res.status(404).json({ msg: 'No found store' })
+            }
         })
         .catch(err => {
-            console.warn(err)
-            res.status(500).send({ msg: 'Error on delete the client' })
+            console.error(err)
+            res.status(500).json(err)
         })
     } else{
         res.status(400).send({ msg: 'No data' })
@@ -93,17 +99,25 @@ clients.put("/:clientID", (req, res, next) => {
 clients.patch("/:clientID",(req,res,next)=>{
     const{ clientID : id} = req.params
     const {body} = req
-    console.log(body)
     if(req.body){
-        let response = {}
-        Client.updateOne(
-            {_id:id},
+        let response = {}//identado id
+        Client.findByIdAndUpdate(
+            {
+                _id:id
+            },
             {
                 name: req.body.name,
                 email: req.body.email    
+            },
+            function(err, result) {
+                if (!err) {
+                    response.anterior = result
+                }
             }
-        ).then(categoryUpdated=> {
-            response.nosql = categoryUpdated
+        )
+        .isDeleted(false)//isDelete bajado 
+        .then(categoryUpdated=> {
+            response.nuevo = categoryUpdated
             response.msg = 'Client updated'
             res.status(200).send(response)
         })

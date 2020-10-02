@@ -1,12 +1,13 @@
 import express from "express";
+
 import {Store} from "../models";
+import { mdJWT } from "../middleware/verifyToken";
 
-
+//imports reorganizados
 const stores = express.Router()
 
 stores.post("", (req, res, next) => {
     const { body } = req
-    console.log(body);
     Store.create(body)
         .then(storeCreated => {
             res.nosql = storeCreated
@@ -20,12 +21,14 @@ stores.post("", (req, res, next) => {
 // all 
 stores.get('', (req, res, next) => {
     const {body} = req.query
-    console.log({body}) 
     if(body !=   undefined){
         const {storeName} = req.query
-        Store.findOne({
-            name: storeName
-        })
+        Store.findOne(
+            {
+                name: storeName//identado
+            }
+        )
+        .isDeleted(false)//en nueva linea
         .then(storeFound => {
             if (storeFound)
                 res.status(200).json(storeFound)
@@ -38,7 +41,9 @@ stores.get('', (req, res, next) => {
         })
     }
     else{
-        Store.find({}).then(storesFound => {
+        Store.find({})
+        .isDeleted(false)//en nueva linea
+        .then(storesFound => {
             res.status(200).json(storesFound)
         })
         .catch(err => {
@@ -50,9 +55,8 @@ stores.get('', (req, res, next) => {
 
 stores.get('/:storeID', (req, res, next) => {
     const { storeID: id } = req.params
-    Store.findOne({
-        _id: id
-    })
+    Store.find({_id: id})
+    .isDeleted(false)//en nueva linea
     .then(storeFound => {
         if (storeFound){
             res.status(200).json(storeFound)
@@ -67,42 +71,54 @@ stores.get('/:storeID', (req, res, next) => {
     })
 }) 
 // borrado en cascada............... borrar items?
-stores.put("/:storeID", (req, res, next) => {
+stores.put("/:storeID",(req, res, next) => {
     const { storeID: id } = req.params
     if (id) {
         let response = {}
-        Store.findOneAndDelete({_id:id}, function(err, docs) {
-            if(!err){
-                response.nosql = docs           
-                console.log(response)
-                return docs
+        Store.findOne({
+            _id: id
+        })
+        .then(storeFound => {
+            if (storeFound){
+                storeFound.softdelete(function(err,newTest) {
+                    if (err) { res.json(err) }  
+                  });
+                res.status(200).json(storeFound)
             }
-        }).then(() => {
-            response.msg = 'store delete'
-            res.status(200).send(response)
+            else{
+                res.status(404).json({ msg: 'No found store' })
+            }
         })
         .catch(err => {
-            console.warn(err)
-            res.status(500).send({ msg: 'Error on delete the store' })
+            console.error(err)
+            res.status(500).json(err)
         })
     } else{
         res.status(400).send({ msg: 'No data' })
     }
 });
 //actualizado en cascada
-stores.patch("/:storeID",(req,res,next)=>{
+stores.patch("/:storeID",(req, res, next)=>{
     const{ storeID : id} = req.params
     const {body} = req
-    console.log(body)
     if(req.body){
         let response = {}
-        Store.updateOne(
-            {_id:id},
+        Store.findByIdAndUpdate(
             {
-                name: req.body.name,   
+                _id:id//identado
+            },
+            {
+                name: req.body.name
             }
-        ).then(storeUpdated=> {
-            response.nosql = storeUpdated
+            ,function(err, result) {
+                if (!err) {
+                    response.anterior = result
+                }
+            }
+        )
+        .isDeleted(false)//en nueva linea
+        .then(storeUpdated=> {
+            response.nuevo = storeUpdated
             response.msg = 'store updated'
             res.status(200).send(response)
         })

@@ -1,12 +1,12 @@
-import express from "express";
+import express, { response } from "express";
 import {Dealer} from "../models";
-
+import { sign } from '../services/jwtService'
 
 const dealers = express.Router()
 
 dealers.post("", (req, res, next) => {
     const { body } = req
-    console.log(body);
+    g(body);
     Dealer.create(body)
         .then(dealerCreated => {
             res.nosql = dealerCreated
@@ -19,8 +19,8 @@ dealers.post("", (req, res, next) => {
 });
 // all 
 dealers.get('', (req, res, next) => {
+    let response = {}
     const {body} = req.query
-    console.log({body}) 
     if(body !=   undefined){
         const {dealerName} = req.query
         Dealer.findOne({
@@ -38,8 +38,10 @@ dealers.get('', (req, res, next) => {
         })
     }
     else{
-        Dealer.find({}).then(dealersFound => {
-            res.status(200).json(dealersFound)
+        Dealer.find({}).isDeleted(false)
+        .then(dealersFound => {
+            response.nosql = dealersFound
+            res.status(200).json(response)
         })
         .catch(err => {
             console.error(err)
@@ -52,7 +54,7 @@ dealers.get('/:dealerID', (req, res, next) => {
     const { dealerID: id } = req.params
     Dealer.findOne({
         _id: id
-    })
+    }).isDeleted(false)
     .then(dealerFound => {
         if (dealerFound){
             res.status(200).json(dealerFound)
@@ -71,19 +73,23 @@ dealers.put("/:dealerID", (req, res, next) => {
     const { dealerID: id } = req.params
     if (id) {
         let response = {}
-        Dealer.findOneAndDelete({_id:id}, function(err, docs) {
-            if(!err){
-                response.nosql = docs           
-                console.log(response)
-                return docs
+        Dealer.findOne({
+            _id: id
+        })
+        .then(dealerFound => {
+            if (dealerFound){
+                dealerFound.softdelete(function(err) {
+                    if (err) { res.json(err) }  
+                  });
+                res.status(200).json(dealerFound)
             }
-        }).then(() => {
-            response.msg = 'Dealer delete'
-            res.status(200).send(response)
+            else{
+                res.status(404).json({ msg: 'No found store' })
+            }
         })
         .catch(err => {
-            console.warn(err)
-            res.status(500).send({ msg: 'Error on delete the dealer' })
+            console.error(err)
+            res.status(500).json(err)
         })
     } else{
         res.status(400).send({ msg: 'No data' })
@@ -93,17 +99,20 @@ dealers.put("/:dealerID", (req, res, next) => {
 dealers.patch("/:dealerID",(req,res,next)=>{
     const{ dealerID : id} = req.params
     const {body} = req
-    console.log(body)
     if(req.body){
         let response = {}
-        Dealer.updateOne(
+        Dealer.findByIdAndUpdate(
             {_id:id},
             {
                 name: req.body.name,
                 email: req.body.email    
+            },
+            function(err, result) { 
+                    response.anterior = result
             }
-        ).then(dealerUpdated=> {
-            response.nosql = dealerUpdated
+        ).isDeleted(false)
+        .then(dealerUpdated=> {
+            response.nuevo = dealerUpdated
             response.msg = 'dealer updated'
             res.status(200).send(response)
         })
